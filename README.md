@@ -6,7 +6,7 @@ Let's start with an example.
 
 mytest.cxx:
 ```
-#include<test.h>
+#include "test.h"
 
 TEST(my test description)(Testing& t) {
 	int x = 1 + 1;
@@ -19,9 +19,10 @@ TEST(my test description)(Testing& t) {
 There is a macro called TEST, which you give a string of text to identify the test case. It should be unique.
 
 The TEST macro creates a function name for you, so you just need to fill out the rest of the function definition.
-Similar to testing in Go, tests are provided with an object that can be used to denote a test has failed.
+Similar to testing in Go, tests are provided with an object that can be used to mark a test failed with a context message.
 There are 3 functions to denote a failure, ```fail()```, ```fail("your message")```, ```failf("your message %s", "values")```
 
-Unlike Go tests, this doesn't currently keep track of multiple failure reasons, so it makes sense to return after a failure.
+Like Go tests, you can log multiple failures within a single test function, if that makes sense. If not, just return after
+marking the failure.
 
 Do not create a main function in your test, one will automagically be provided.

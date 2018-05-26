@@ -1,7 +1,10 @@
 
-#include<unordered_map>
 #include<cstdarg>
 #include<cstdio>
+#include<iostream>
+#include<vector>
+#include<unordered_map>
+
 
 #define TEST_FUNC_NAME(i) tester_at_index_ ## i
 #define TEST_VARIABLE_NAME(i) registered_tester_for_ ## i
@@ -15,46 +18,45 @@
 
 class Testing {
 	bool failedToggle;
-	std::string failureMessage;
+	std::vector<std::string> failureMessages;
 
 	public:
 		Testing() {
 			failedToggle = false;
-			failureMessage = "Failed";
 		}
 
 		void fail() {
 			failedToggle = true;
+			failureMessages.push_back("Failed");
 		};
 
 
-		void fail(std::string message) {
+		void fail(const std::string& message) {
 			failedToggle = true;
-			failureMessage = message;
+			failureMessages.push_back(message);
 		};
 		
-		void failf(std::string format, ...) {
+		void failf(const std::string& format, ...) {
 			failedToggle = true;
 			int sz = 100;
 			char buf[sz];
 			va_list args;
 			va_start(args, format);
 			std::vsnprintf(buf, sz, format.c_str(), args);
-			failureMessage = std::string(buf);
+			failureMessages.push_back(std::string(buf));
 		};
 
 		bool failed() {
 			return failedToggle;
 		};
 
-		std::string message() {
-			return failureMessage;
+		std::vector<std::string> messages() {
+			return failureMessages;
 		};
 };
 
 typedef void (*testerfunc)(Testing&);
 
-// Turn back into a vector to get working again.
 std::unordered_map<std::string, testerfunc> registered_tests;
 bool register_test(std::string testname, testerfunc tester) {
 	registered_tests.insert(std::make_pair(testname, tester));
@@ -69,13 +71,15 @@ int main(int argc, char ** argv) {
 
 		if (t.failed()) {
 			failed += 1;
-			cerr << x.first << ": " << t.message() << endl;
+			for (const std::string& err : t.messages()) {
+				std::cerr << x.first << ": " << err << std::endl;
+			}
 		}
 	}
 
 	if (failed > 0) {
-		cerr << failed << "/" << registered_tests.size() << " Failed!"<< endl;
+		std::cerr << failed << "/" << registered_tests.size() << " Failed!"<< std::endl;
 	} else {
-		cerr << "All " << registered_tests.size() << " tests passed!" << endl;
+		std::cerr << "All " << registered_tests.size() << " tests passed!" << std::endl;
 	}
 }
